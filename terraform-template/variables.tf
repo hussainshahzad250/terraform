@@ -1,6 +1,7 @@
 # environment variables
 variable "region" {
   description = "region to create resources"
+  default     = "ap-south-1"
   type        = string
 }
 
