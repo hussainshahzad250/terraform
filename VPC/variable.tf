@@ -2,10 +2,12 @@ variable "region" {
   type        = string
   description = "Provide region"
 }
+
 variable "environment" {
   type        = string
   default     = "UAT"
 }
+
 variable "clientName" {
   type        = string
 }
@@ -19,6 +21,7 @@ variable "create_vpc" {
   type        = bool
   default     = true
 }
+
 variable "vpc_cidr" {
   description = "The CIDR block for the VPC. Default value is a valid CIDR, but not acceptable by AWS and should be overridden"
   type        = string
@@ -29,6 +32,7 @@ variable "enable_dns_support" {
   type        = bool
   default     = true
 }
+
 variable "enable_dns_hostnames" {
   description = "A boolean flag to enable/disable DNS hostnames in the VPC"
   type        = bool
