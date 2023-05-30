@@ -40,6 +40,6 @@ resource "aws_security_group" "TF_SG" {
   }
 
   tags = {
-    "Name" = format("%s-%s-%s-Terraform-SG",var.environment,var.clientName,var.product)
+    "Name" = format("%s-%s-%s-Terraform-SG", var.environment, var.clientName, var.product)
   }
 }

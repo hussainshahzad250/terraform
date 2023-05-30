@@ -6,7 +6,9 @@ resource "aws_vpc" "vpc" {
   enable_dns_hostnames             = var.enable_dns_hostnames
   assign_generated_ipv6_cidr_block = var.enable_ipv6
   tags = {
-    "Name" = format("%s-%s-%s",var.environment,var.clientName,var.product)
+    "Environment" = var.environment
+    "ClientName"  = var.clientName
+    "Name"        = format("%s-%s-%s", var.environment, var.clientName, var.product)
   }
 }
 

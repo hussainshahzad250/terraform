@@ -3,17 +3,17 @@ variable "region" {
   description = "Provide region"
 }
 variable "environment" {
-  type        = string
-  default     = "UAT"
+  type    = string
+  default = "UAT"
 }
 variable "clientName" {
-  type        = string
+  type = string
 }
 
 variable "product" {
-  type        = string
+  type = string
 }
-variable amiId {
+variable "amiId" {
   type        = string
   description = "description"
 }

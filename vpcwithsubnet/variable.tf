@@ -4,16 +4,16 @@ variable "region" {
 }
 
 variable "environment" {
-  type        = string
-  default     = "UAT"
+  type    = string
+  default = "UAT"
 }
 
 variable "clientName" {
-  type        = string
+  type = string
 }
 
 variable "product" {
-  type        = string
+  type = string
 }
 
 variable "vpc_cidr" {
@@ -32,4 +32,3 @@ variable "private_subnet_cidr" {
   default     = ""
   description = "private subnet cidr range"
 }
-
