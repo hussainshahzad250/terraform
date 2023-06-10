@@ -2,10 +2,12 @@ variable "region" {
   type        = string
   description = "Provide region"
 }
+
 variable "environment" {
   type    = string
   default = "UAT"
 }
+
 variable "clientName" {
   type = string
 }
@@ -13,7 +15,17 @@ variable "clientName" {
 variable "product" {
   type = string
 }
-variable "amiId" {
+
+variable "vpc_cidr" {
   type        = string
+  description = "VPC CIDR range"
+}
+
+variable "public_subnet_cidr" {
+  type        = string
+  default     = ""
   description = "description"
 }
+
+
+

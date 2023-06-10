@@ -1,6 +1,8 @@
 # 1 : Create a VPC
 resource "aws_vpc" "myvpc" {
-  cidr_block = var.vpc_cidr
+  cidr_block           = var.vpc_cidr
+  enable_dns_hostnames = true
+  enable_dns_support   = true
   tags = {
     "Name" = format("%s-%s-%s-myvpc", var.environment, var.clientName, var.product)
   }
@@ -18,7 +20,9 @@ resource "aws_subnet" "PublicSubnet" {
 
 #  3 : create a private subnet
 resource "aws_subnet" "PrivSubnet" {
+
   vpc_id                  = aws_vpc.myvpc.id
+  availability_zone       = "ap-south-1b"
   cidr_block              = var.private_subnet_cidr
   map_public_ip_on_launch = true
 
@@ -26,6 +30,38 @@ resource "aws_subnet" "PrivSubnet" {
     "Name" = format("%s-%s-%s-private-db-subnet", var.environment, var.clientName, var.product)
   }
 }
+
+#  4 : create IGW
+resource "aws_internet_gateway" "myIgw" {
+  vpc_id = aws_vpc.myvpc.id
+  tags = {
+    "Name" = format("%s-%s-%s-myIgw", var.environment, var.clientName, var.product)
+  }
+}
+
+#  5 : route Tables for public subnet
+resource "aws_route_table" "PublicRT" {
+  vpc_id = aws_vpc.myvpc.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.myIgw.id
+  }
+  tags = {
+    "Name" = format("%s-%s-%s-PublicRT", var.environment, var.clientName, var.product)
+  }
+}
+
+#  7 : route table association public subnet 
+resource "aws_route_table_association" "PublicRTAssociation" {
+  subnet_id      = aws_subnet.PublicSubnet.id
+  route_table_id = aws_route_table.PublicRT.id
+}
+
+# 8 Attach the internet gateway to the VPC
+# resource "aws_vpc_attachment" "example" {
+#   vpc_id              = aws_vpc.myvpc.id
+#   internet_gateway_id = aws_internet_gateway.myIgw.id
+# }
 
 # create security group for the web server
 resource "aws_security_group" "webserver_security_group" {
@@ -79,7 +115,7 @@ resource "aws_security_group" "db_security_group" {
   }
 }
 
-# This section allow you to access DB from out side from any IP
+# This section allow you to access DB from any IP (FOR PUBLICLY ACCESS)
 # resource "aws_security_group_rule" "rds_ingress_rule" {
 #   security_group_id = aws_security_group.db_security_group.id
 #   type              = "ingress"
@@ -102,12 +138,8 @@ resource "aws_db_subnet_group" "database_subnet_group" {
   }
 }
 
-
-
-
 # create the rds instance
 resource "aws_db_instance" "db_instance" {
-
   engine                 = "mysql"
   engine_version         = "8.0.32"
   multi_az               = false
@@ -119,10 +151,7 @@ resource "aws_db_instance" "db_instance" {
   db_subnet_group_name   = aws_db_subnet_group.database_subnet_group.name
   vpc_security_group_ids = [aws_security_group.db_security_group.id]
   availability_zone      = "ap-south-1a"
-  # db_name                = "developmentdb"
-  skip_final_snapshot = true
-
+  publicly_accessible    = true
+  skip_final_snapshot    = true
 
 }
-
-

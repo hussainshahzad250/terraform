@@ -3,18 +3,18 @@ variable "region" {
   description = "Provide region"
 }
 variable "environment" {
-  type        = string
-  default     = "UAT"
+  type    = string
+  default = "UAT"
 }
 variable "clientName" {
-  type        = string
+  type = string
 }
 
 variable "product" {
-  type        = string
+  type = string
 }
 
-variable dbstorage {
+variable "dbstorage" {
   type        = string
   default     = ""
   description = "description"

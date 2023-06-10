@@ -2,4 +2,6 @@ region      = "ap-south-1"
 environment = "UAT"
 clientName  = "SHAHZAD"
 product     = "myapp"
-amiId       = "ami-0f5ee92e2d63afc18"
+vpc_cidr    = "198.162.0.0/16"
+public_subnet_cidr  = "198.162.0.0/16"
+
