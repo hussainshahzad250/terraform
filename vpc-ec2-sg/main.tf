@@ -1,4 +1,4 @@
-# 1 : Create a VPC
+# 1: Create a VPC
 resource "aws_vpc" "myvpc" {
   cidr_block = var.vpc_cidr
   tags = {
@@ -6,8 +6,7 @@ resource "aws_vpc" "myvpc" {
   }
 }
 
-
-#  2: Create a public subnet
+# 2: Create a public subnet
 resource "aws_subnet" "PublicSubnet" {
   vpc_id            = aws_vpc.myvpc.id
   availability_zone = "ap-south-1a"
@@ -17,39 +16,41 @@ resource "aws_subnet" "PublicSubnet" {
   }
 }
 
-# 2 Create an IAM role
-resource "aws_iam_role" "example_role" {
-  name = "example-role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
+# 3: create IGW
+resource "aws_internet_gateway" "myIgw" {
+  vpc_id = aws_vpc.myvpc.id
+  tags = {
+    "Name" = format("%s-%s-%s-myIgw", var.environment, var.clientName, var.product)
+  }
 }
 
-resource "aws_iam_role_policy_attachment" "example_attachment" {
-  role       = aws_iam_role.example_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
+# 4: route Tables for public subnet
+resource "aws_route_table" "PublicRT" {
+  vpc_id = aws_vpc.myvpc.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.myIgw.id
+  }
+  tags = {
+    "Name" = format("%s-%s-%s-PublicRT", var.environment, var.clientName, var.product)
+  }
 }
 
-#securitygroup using Terraform
+# 5: route table association public subnet 
+resource "aws_route_table_association" "PublicRTAssociation" {
+  subnet_id      = aws_subnet.PublicSubnet.id
+  route_table_id = aws_route_table.PublicRT.id
+}
+
+
+# 6: securitygroup using Terraform
 resource "aws_security_group" "my_sg" {
   name        = "security group using Terraform"
   description = "security group using Terraform"
   vpc_id      = aws_vpc.myvpc.id
 
   ingress {
-    description = "HTTPS"
+    description = "Allow HTTPS from anywhere"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
@@ -57,7 +58,7 @@ resource "aws_security_group" "my_sg" {
   }
 
   ingress {
-    description = "HTTP"
+    description = "Allow HTTP from anywhere"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -65,7 +66,7 @@ resource "aws_security_group" "my_sg" {
   }
 
   ingress {
-    description = "SSH"
+    description = "Allow SSH from anywhere"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
@@ -84,17 +85,13 @@ resource "aws_security_group" "my_sg" {
   }
 }
 
-# Create an EC2 instance
+# Create an EC2 instance and attach security group
 resource "aws_instance" "my_instance" {
-  ami             = "ami-0f5ee92e2d63afc18"
-  instance_type   = "t2.micro"
-  key_name        = "test"
-  security_groups = [aws_security_group.my_sg.id]
-  subnet_id       = aws_subnet.PublicSubnet.id
-  # Attach the IAM role to the EC2 instance
-  # iam_instance_profile {
-  #   name = aws_iam_role.example_role.name
-  # }
+  ami                         = "ami-0f5ee92e2d63afc18"
+  instance_type               = "t2.micro"
+  key_name                    = "test"
+  security_groups             = [aws_security_group.my_sg.id]
+  subnet_id                   = aws_subnet.PublicSubnet.id
   associate_public_ip_address = true
 
   tags = {

@@ -24,12 +24,8 @@ variable "vpc_cidr" {
 variable "public_subnet_cidr" {
   type        = string
   default     = ""
-  description = "public subnet cidr range"
+  description = "description"
 }
 
-variable "private_subnet_cidr" {
-  type        = string
-  default     = ""
-  description = "private subnet cidr range"
-}
+
 
