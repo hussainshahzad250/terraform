@@ -2,11 +2,11 @@ resource "aws_instance" "jenkins" {
   ami                    = var.ami
   instance_type          = "t2.micro"
   key_name               = "test"
-  iam_instance_profile   = "${aws_iam_instance_profile.ec2_profile.name}"
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.name
   vpc_security_group_ids = [aws_security_group.allow_login.id]
   tags = {
     Name = var.project
-    OS = "ubuntu"
+    OS   = "ubuntu"
   }
   user_data = <<EOC
 #!/bin/bash -xe
